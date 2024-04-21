@@ -140,11 +140,11 @@ def predict(args):
     k_max = max(Ks)
 
     cf_scores, metrics_dict = evaluate_func(model, data, Ks, num_processes, device)
-    np.save(args.save_dir + 'cf_scores.npy', cf_scores)
+
     print('CF Evaluation: Precision [{:.4f}, {:.4f}], Recall [{:.4f}, {:.4f}], NDCG [{:.4f}, {:.4f}]'.format(
         metrics_dict[k_min]['precision'], metrics_dict[k_max]['precision'], metrics_dict[k_min]['recall'], metrics_dict[k_max]['recall'], metrics_dict[k_min]['ndcg'], metrics_dict[k_max]['ndcg']))
 
-
+    np.save(args.save_dir + 'cf_scores.npy', cf_scores)
 
 if __name__ == '__main__':
     try:
