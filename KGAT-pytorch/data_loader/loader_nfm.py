@@ -101,10 +101,11 @@ class DataLoaderNFM(DataLoaderBase):
         # user_cols = np.repeat(batch_user, self.n_items)
         # user_data = [1] * n_rows
 
-        batch_user_sp = sp.vstack([self.user_matrix[batch_user]] * self.n_items)
         # batch_user_sp = sp.coo_matrix((user_data, (user_rows, user_cols)), shape=(n_rows, self.n_users)).tocsr()
-        rep_user_ids = np.repeat(batch_user, self.n_items)
-        batch_item_sp = self.feat_matrix[rep_user_ids]
+        rep_batch_user = np.repeat(batch_user, self.n_items)
+        batch_user_sp = self.user_matrix[rep_batch_user]
+
+        batch_item_sp = sp.vstack([self.feat_matrix] * len(batch_user))
 
         feature_values = sp.hstack([batch_user_sp, batch_item_sp])
         # feature_values = self.convert_coo2tensor(feature_values.tocoo())
