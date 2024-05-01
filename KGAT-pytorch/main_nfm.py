@@ -176,7 +176,6 @@ def train(args):
         n_batch = data.n_cf_train // data.train_batch_size + 1
 
         for iter in range(1, n_batch + 1):
-            break #
             time2 = time()
             pos_feature_values, neg_feature_values = data.generate_train_batch(data.train_user_dict)
             # pos_feature_values = pos_feature_values.to(device)
