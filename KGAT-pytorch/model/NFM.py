@@ -29,7 +29,7 @@ class HiddenLayer(nn.Module):
 class NFM(nn.Module):
 
     def __init__(self, args,
-                 n_users, n_items, n_entities,
+                 n_users, n_items, n_entities, n_user_attr,
                  user_pre_embed=None, item_pre_embed=None):
 
         super(NFM, self).__init__()
@@ -38,8 +38,9 @@ class NFM(nn.Module):
 
         self.n_users = n_users
         self.n_items = n_items
+        self.n_user_attr = n_user_attr
         self.n_entities = n_entities
-        self.n_features = n_users + n_entities
+        self.n_features = n_user_attr + n_entities
 
         self.embed_dim = args.embed_dim
         self.l2loss_lambda = args.l2loss_lambda

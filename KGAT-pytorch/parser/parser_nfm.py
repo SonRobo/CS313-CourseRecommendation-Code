@@ -14,6 +14,9 @@ def parse_nfm_args():
                         help='Choose a dataset from {yelp2018, last-fm, amazon-book}')
     parser.add_argument('--data_dir', nargs='?', default='datasets/',
                         help='Input data path.')
+    
+    parser.add_argument('--use_user_info', type=int, default=0,
+                        help='0: No user info, 1: Use user info')
 
     parser.add_argument('--use_pretrain', type=int, default=1,
                         help='0: No pretrain, 1: Pretrain with the learned embeddings, 2: Pretrain with stored model.')

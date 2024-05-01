@@ -15,15 +15,35 @@ class DataLoaderNFM(DataLoaderBase):
         self.test_batch_size = args.test_batch_size
 
         kg_data = self.load_kg(self.kg_file)
-        self.construct_data(kg_data)
+        users_info = self.load_user_info(self.user_file) if args.use_user_info else None
+
+        self.construct_data(kg_data, users_info)
         self.print_info(logging)
 
 
-    def construct_data(self, kg_data):
-        self.n_entities = max(max(kg_data['h']), max(kg_data['t'])) + 1
-        self.n_users_entities = self.n_users + self.n_entities
+    def construct_data(self, kg_data, users_info):
+        # construct user matrix
+        feat_rows = list(range(self.n_users))
+        feat_cols = list(range(self.n_users))
+        feat_data = [1] * self.n_users
+
+        self.n_user_attr = self.n_users
+
+        if users_info is not None:
+            user_cols = [col for col in users_info.columns
+                             if col not in ['org_id', 'remap_id']]
+            
+            for col in user_cols:
+                feat_rows += list(range(self.n_users))
+                feat_cols += (users_info[col] + self.n_user_attr).to_list()
+                feat_data += [1] * users_info.shape[0]
+                self.n_user_attr += max(users_info[col]) + 1
+
+        self.user_matrix = sp.coo_matrix((feat_data, (feat_rows, feat_cols)), shape=(self.n_users, self.n_user_attr)).tocsr()
 
         # construct feature matrix
+        self.n_entities = max(max(kg_data['h']), max(kg_data['t'])) + 1
+
         feat_rows = list(range(self.n_items))
         feat_cols = list(range(self.n_items))
         feat_data = [1] * self.n_items
@@ -33,14 +53,15 @@ class DataLoaderNFM(DataLoaderBase):
         feat_cols += filtered_kg_data['t'].tolist()
         feat_data += [1] * filtered_kg_data.shape[0]
 
-        self.user_matrix = sp.identity(self.n_users).tocsr()
         self.feat_matrix = sp.coo_matrix((feat_data, (feat_rows, feat_cols)), shape=(self.n_items, self.n_entities)).tocsr()
 
+        self.n_users_entities = self.n_user_attr + self.n_entities
 
     def print_info(self, logging):
         logging.info('n_users:              %d' % self.n_users)
         logging.info('n_items:              %d' % self.n_items)
         logging.info('n_entities:           %d' % self.n_entities)
+        logging.info('n_user_attr:           %d' % self.n_user_attr)
         logging.info('n_users_entities:     %d' % self.n_users_entities)
 
         logging.info('n_cf_train:           %d' % self.n_cf_train)

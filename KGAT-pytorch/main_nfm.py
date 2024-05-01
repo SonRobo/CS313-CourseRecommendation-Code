@@ -139,7 +139,7 @@ def train(args):
         user_pre_embed, item_pre_embed = None, None
 
     # construct model & optimizer
-    model = NFM(args, data.n_users, data.n_items, data.n_entities, user_pre_embed, item_pre_embed)
+    model = NFM(args, data.n_users, data.n_items, data.n_entities, data.n_user_attr, user_pre_embed, item_pre_embed)
     if args.use_pretrain == 2:
         model = load_model(model, args.pretrain_model_path, device=device)
 
@@ -242,7 +242,7 @@ def predict(args):
     data = DataLoaderNFM(args, logging)
 
     # load model
-    model = NFM(args, data.n_users, data.n_items, data.n_entities)
+    model = NFM(args, data.n_users, data.n_items, data.n_entities, data.n_user_attr)
     model = load_model(model, args.pretrain_model_path)
     model.to(device)
 

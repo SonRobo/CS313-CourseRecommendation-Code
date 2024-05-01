@@ -1,0 +1,10 @@
+2024-05-01 15:11:36,135 - root - INFO - Namespace(seed=2019, model_type='fm', data_name='data-mooc-for-test-final', data_dir='./', use_user_info=0, use_pretrain=0, pretrain_embedding_dir='datasets/pretrain/', pretrain_model_path='trained_model/model.pth', embed_dim=64, hidden_dim_list='[64, 32, 16]', mess_dropout='[0.1, 0.1, 0.1]', l2loss_lambda=1e-05, train_batch_size=1024, test_batch_size=1024, test_cores=0, lr=0.0001, n_epoch=1000, stopping_steps=5, print_every=50, evaluate_every=5, Ks='[1, 5, 10]', save_dir='cf_scores.np')
+2024-05-01 15:11:38,834 - root - INFO - n_users:              99969
+2024-05-01 15:11:38,834 - root - INFO - n_items:              2831
+2024-05-01 15:11:38,841 - root - INFO - n_entities:           10218
+2024-05-01 15:11:38,842 - root - INFO - n_user_attr:           99969
+2024-05-01 15:11:38,842 - root - INFO - n_users_entities:     110187
+2024-05-01 15:11:38,843 - root - INFO - n_cf_train:           1792212
+2024-05-01 15:11:38,844 - root - INFO - n_cf_test:            99969
+2024-05-01 15:11:38,844 - root - INFO - shape of user_matrix: (99969, 99969)
+2024-05-01 15:11:38,844 - root - INFO - shape of feat_matrix: (2831, 10218)
