@@ -95,8 +95,7 @@ def evaluate(model, dataloader, Ks, num_processes, device):
             with torch.no_grad():
                 batch_scores = model(feature_values, is_train=False, device=device)            # (batch_size)
 
-            # cf_users.extend(np.repeat(batch_user, n_items).tolist())
-            cf_users.extend(user_ids * n_items)
+            cf_users.extend(np.repeat(batch_user, n_items).tolist())
             cf_items.extend(item_ids * len(batch_user))
             cf_scores.append(batch_scores.cpu())
             pbar.update(1)
