@@ -96,12 +96,13 @@ class DataLoaderNFM(DataLoaderBase):
 
 
     def generate_test_batch(self, batch_user):
-        n_rows = len(batch_user) * self.n_items
-        user_rows = list(range(n_rows))
-        user_cols = np.repeat(batch_user, self.n_items)
-        user_data = [1] * n_rows
+        # n_rows = len(batch_user) * self.n_items
+        # user_rows = list(range(n_rows))
+        # user_cols = np.repeat(batch_user, self.n_items)
+        # user_data = [1] * n_rows
 
-        batch_user_sp = sp.coo_matrix((user_data, (user_rows, user_cols)), shape=(n_rows, self.n_users)).tocsr()
+        batch_user_sp = sp.vstack([self.user_matrix[batch_user]] * self.n_items)
+        # batch_user_sp = sp.coo_matrix((user_data, (user_rows, user_cols)), shape=(n_rows, self.n_users)).tocsr()
         batch_item_sp = sp.vstack([self.feat_matrix] * len(batch_user))
 
         feature_values = sp.hstack([batch_user_sp, batch_item_sp])
