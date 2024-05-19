@@ -136,13 +136,17 @@ def predict(args):
         evaluate_func = evaluate
 
     Ks = eval(args.Ks)
-    k_min = min(Ks)
-    k_max = max(Ks)
 
     cf_scores, metrics_dict = evaluate_func(model, data, Ks, num_processes, device)
 
-    print('CF Evaluation: Precision [{:.4f}, {:.4f}], Recall [{:.4f}, {:.4f}], NDCG [{:.4f}, {:.4f}]'.format(
-        metrics_dict[k_min]['precision'], metrics_dict[k_max]['precision'], metrics_dict[k_min]['recall'], metrics_dict[k_max]['recall'], metrics_dict[k_min]['ndcg'], metrics_dict[k_max]['ndcg']))
+    for k in Ks:
+        print(f'*** CF Evaluation @{k} ***')
+        print(f'Precision@{k}   : ', metrics_dict[k]['precision'])
+        print(f'Recall@{k}      : ', metrics_dict[k]['recall'])
+        print(f'NDCG@{k}        : ', metrics_dict[k]['ndcg'])
+
+    if not os.path.exists(args.save_dir):
+        os.makedirs(args.save_dir)
 
     np.save(args.save_dir + 'cf_scores.npy', cf_scores)
 
