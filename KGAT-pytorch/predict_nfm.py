@@ -124,7 +124,7 @@ def predict(args):
     data = DataLoaderNFM(args, logging)
 
     # load model
-    model = NFM(args, data.n_users, data.n_items, data.n_entities)
+    model = NFM(args, data.n_users, data.n_items, data.n_entities, data.n_user_attr)
     model = load_model(model, args.pretrain_model_path)
     model.to(device)
 
