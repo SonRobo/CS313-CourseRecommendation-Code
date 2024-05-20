@@ -45,12 +45,12 @@ def parse_nfm_args():
                         help='Learning rate.')
     parser.add_argument('--n_epoch', type=int, default=1000,
                         help='Number of epoch.')
-    parser.add_argument('--stopping_steps', type=int, default=5,
+    parser.add_argument('--stopping_steps', type=int, default=10,
                         help='Number of epoch for early stopping')
 
     parser.add_argument('--print_every', type=int, default=1,
                         help='Iter interval of printing loss.')
-    parser.add_argument('--evaluate_every', type=int, default=5,
+    parser.add_argument('--evaluate_every', type=int, default=10,
                         help='Epoch interval of evaluating CF.')
 
     parser.add_argument('--Ks', nargs='?', default='[1, 5, 10]',
