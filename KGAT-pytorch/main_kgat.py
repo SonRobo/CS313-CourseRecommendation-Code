@@ -193,7 +193,7 @@ def train(args):
             if should_stop:
                 break
 
-            if metrics_list[k_min]['recall'].index(best_recall) == len(epoch_list) - 1:
+            if metrics_list[k_max]['recall'].index(best_recall) == len(epoch_list) - 1:
                 save_model(model, args.save_dir, epoch, best_epoch)
                 logging.info('Save model on epoch {:04d}!'.format(epoch))
                 best_epoch = epoch
