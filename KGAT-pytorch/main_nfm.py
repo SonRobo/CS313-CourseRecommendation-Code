@@ -207,7 +207,7 @@ def train(args):
             for k in Ks:
                 for m in ['precision', 'recall', 'ndcg']:
                     metrics_list[k][m].append(metrics_dict[k][m])
-            best_recall, should_stop = early_stopping(metrics_list[k_min]['recall'], args.stopping_steps)
+            best_recall, should_stop = early_stopping(metrics_list[k_max]['recall'], args.stopping_steps)
 
             if should_stop:
                 break
