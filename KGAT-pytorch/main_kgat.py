@@ -241,5 +241,5 @@ def predict(args):
 
 if __name__ == '__main__':
     args = parse_kgat_args()
-    train(args)
-    # predict(args)
+    # train(args)
+    predict(args)
