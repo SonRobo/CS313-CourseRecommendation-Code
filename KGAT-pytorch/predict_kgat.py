@@ -92,8 +92,8 @@ if __name__ == '__main__':
     parser.add_argument('--user_id', type=int, required=True, help="User ID to predict for")  # Thêm tham số user_id
     parser.add_argument('--pretrain_embedding_dir', type=str)  
     parser.add_argument('--laplacian_type', type=str, default='random-walk')  
+    parser.add_argument('--embed_dim', type=int, default=64)  
     args = parser.parse_args()
-    
     predict_for_user(args, user_id=args.user_id)
 
 
