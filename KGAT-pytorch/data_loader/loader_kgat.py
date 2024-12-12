@@ -23,7 +23,7 @@ class DataLoaderKGAT(DataLoaderBase):
         self.construct_data(kg_data)
         self.print_info(logging)
 
-        # self.laplacian_type = args.laplacian_type
+        self.laplacian_type = args.laplacian_type
         self.create_adjacency_dict()
         self.create_laplacian_dict()
 
