@@ -75,6 +75,8 @@ def predict_for_user(args, user_id):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    
     parser.add_argument('--seed', type=int, default=2019,
                         help='Random seed.')
 
