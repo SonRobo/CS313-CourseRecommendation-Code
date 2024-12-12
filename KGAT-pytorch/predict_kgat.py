@@ -16,78 +16,80 @@ from utils.model_helper import *
 from data_loader.loader_kgat import DataLoaderKGAT
 
 
-def evaluate(model, dataloader, Ks, device):
-    test_batch_size = dataloader.test_batch_size
-    train_user_dict = dataloader.train_user_dict
-    test_user_dict = dataloader.test_user_dict
-
+def evaluate_for_user(model, user_id, dataloader, device, top_k=10):
+    """
+    Evaluate the model for a single user and return the top_k predictions.
+    """
     model.eval()
 
-    user_ids = list(test_user_dict.keys())
-    user_ids_batches = [user_ids[i: i + test_batch_size] for i in range(0, len(user_ids), test_batch_size)]
-    user_ids_batches = [torch.LongTensor(d) for d in user_ids_batches]
-
+    # Convert user_id and item_ids to tensors
+    user_tensor = torch.LongTensor([user_id]).to(device)
     n_items = dataloader.n_items
     item_ids = torch.arange(n_items, dtype=torch.long).to(device)
 
-    cf_scores = []
-    metric_names = ['precision', 'recall', 'ndcg']
-    metrics_dict = {k: {m: [] for m in metric_names} for k in Ks}
+    # Predict scores for all items for the given user
+    with torch.no_grad():
+        scores = model(user_tensor, item_ids, mode='predict')  # (1, n_items)
 
-    with tqdm(total=len(user_ids_batches), desc='Evaluating Iteration') as pbar:
-        for batch_user_ids in user_ids_batches:
-            batch_user_ids = batch_user_ids.to(device)
+    scores = scores.cpu().numpy().flatten()
 
-            with torch.no_grad():
-                batch_scores = model(batch_user_ids, item_ids, mode='predict')       # (n_batch_users, n_items)
+    # Exclude items the user has already interacted with
+    train_user_dict = dataloader.train_user_dict
+    interacted_items = set(train_user_dict.get(user_id, []))
 
-            batch_scores = batch_scores.cpu()
-            batch_metrics = calc_metrics_at_k(batch_scores, train_user_dict, test_user_dict, batch_user_ids.cpu().numpy(), item_ids.cpu().numpy(), Ks)
+    # Create a list of (item_id, score), filter out interacted items, and sort by score
+    item_scores = [(item_id, score) for item_id, score in enumerate(scores) if item_id not in interacted_items]
+    item_scores = sorted(item_scores, key=lambda x: x[1], reverse=True)
 
-            cf_scores.append(batch_scores.numpy())
-            for k in Ks:
-                for m in metric_names:
-                    metrics_dict[k][m].append(batch_metrics[k][m])
-            pbar.update(1)
+    # Get the top_k items
+    top_items = item_scores[:top_k]
+    return top_items
 
-    cf_scores = np.concatenate(cf_scores, axis=0)
-    for k in Ks:
-        for m in metric_names:
-            metrics_dict[k][m] = np.concatenate(metrics_dict[k][m]).mean()
-    return cf_scores, metrics_dict
 
-def predict(args):
+def predict_for_user(args, user_id):
+    """
+    Predict top 10 recommendations for a single user.
+    """
     # GPU / CPU
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # load data
+    # Load data
     data = DataLoaderKGAT(args, logging)
 
-    # load model
+    # Load model
     model = KGAT(args, data.n_users, data.n_entities, data.n_relations)
     model = load_model(model, args.pretrain_model_path)
     model.to(device)
 
-    # predict
-    Ks = eval(args.Ks)
-    # k_min = min(Ks)
-    # k_max = max(Ks)
+    # Predict top 10 items for the user
+    top_k = 10
+    top_items = evaluate_for_user(model, user_id, data, device, top_k)
 
-    cf_scores, metrics_dict = evaluate(model, data, Ks, device)
-    
-    if not os.path.exists(args.save_dir):
-        os.makedirs(args.save_dir)
-    np.save(args.save_dir + 'cf_scores.npy', cf_scores)
-    
-    for k in Ks:
-        print(f'*** CF Evaluation @{k} ***')
-        print(f'Precision@{k}   : ', metrics_dict[k]['precision'])
-        print(f'Recall@{k}      : ', metrics_dict[k]['recall'])
-        print(f'NDCG@{k}        : ', metrics_dict[k]['ndcg'])
+    print(f"Top {top_k} recommendations for user {user_id}:")
+    for rank, (item_id, score) in enumerate(top_items, start=1):
+        print(f"{rank}: Item {item_id} with score {score}")
+
+    return top_items
+
 
 
 
 if __name__ == '__main__':
-    args = parse_kgat_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_dir', type=str, required=True)
+    parser.add_argument('--data_name', type=str, default="")
+    parser.add_argument('--use_pretrain', type=int, default=0)
+    parser.add_argument('--pretrain_model_path', type=str, default="")
+    parser.add_argument('--n_epoch', type=int, default=6)
+    parser.add_argument('--cf_batch_size', type=int, default=1024)
+    parser.add_argument('--kg_batch_size', type=int, default=2048)
+    parser.add_argument('--test_batch_size', type=int, default=256)
+    parser.add_argument('--cf_print_every', type=int, default=500)
+    parser.add_argument('--kg_print_every', type=int, default=50)
+    parser.add_argument('--evaluate_every', type=int, default=2)
+    parser.add_argument('--Ks', type=str, default="[1, 5, 10]")
+    parser.add_argument('--save_dir', type=str, default="./results/")
+    parser.add_argument('--user_id', type=int, required=True, help="User ID to predict for")  # Thêm tham số user_id
+    args = parser.parse_args()
     predict(args)
 
