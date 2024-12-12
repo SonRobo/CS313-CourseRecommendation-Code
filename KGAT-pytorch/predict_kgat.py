@@ -91,6 +91,7 @@ if __name__ == '__main__':
     parser.add_argument('--save_dir', type=str, default="./results/")
     parser.add_argument('--user_id', type=int, required=True, help="User ID to predict for")  # Thêm tham số user_id
     parser.add_argument('--pretrain_embedding_dir', type=str)  
+    parser.add_argument('--laplacian_type', type=str, default='random-walk')  
     args = parser.parse_args()
     
     predict_for_user(args, user_id=args.user_id)
